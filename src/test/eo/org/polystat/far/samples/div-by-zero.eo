@@ -1,0 +1,9 @@
++package org.polystat.far
++expected 3
+
+[a b] > test
+  add. > @
+    div. a b
+    div.
+      div. b a
+      a

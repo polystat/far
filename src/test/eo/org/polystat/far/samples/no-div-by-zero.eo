@@ -1,0 +1,12 @@
++package org.polystat.far
++expected 0
+
+[a b] > test
+  if. > @
+    eq.
+      b
+      0
+    "Oops"
+    div.
+      a
+      b
