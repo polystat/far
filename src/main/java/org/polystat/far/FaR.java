@@ -151,12 +151,14 @@ public final class FaR {
      * @throws IOException If fails
      */
     private static XSL xsl(final String name) throws IOException {
+        final String path = String.format("org/polystat/far/%s", name);
         return new XSLDocument(
             new TextOf(
                 new ResourceOf(
-                    String.format("org/polystat/far/%s", name)
+                    path
                 )
-            ).asString()
+            ).asString(),
+            path
         ).with(new ClasspathSources());
     }
 
