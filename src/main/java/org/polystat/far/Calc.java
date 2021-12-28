@@ -99,8 +99,10 @@ public final class Calc {
                             "org/polystat/far/build-calc-function.xsl"
                         )
                     )
-                ).asString()
-            ).applyTo(xml)
+                ).asString(),
+                "build-calc-function.xsl"
+            ).applyTo(xml),
+            "calc-function.xsl"
         );
     }
 
