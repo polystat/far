@@ -31,7 +31,6 @@ import com.jcabi.xml.XMLDocument;
 import com.jcabi.xml.XSL;
 import com.jcabi.xml.XSLDocument;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -41,8 +40,8 @@ import org.cactoos.Func;
 import org.cactoos.io.InputStreamOf;
 import org.cactoos.io.OutputTo;
 import org.cactoos.io.ResourceOf;
+import org.cactoos.iterable.Mapped;
 import org.cactoos.list.ListOf;
-import org.cactoos.list.Mapped;
 import org.cactoos.text.TextOf;
 import org.cactoos.text.UncheckedText;
 import org.eolang.parser.Spy;
@@ -72,7 +71,6 @@ public final class FaR {
      */
     public Collection<String> errors(final Func<String, XML> xmir,
         final String locator) throws Exception {
-        final Collection<String> bugs = new LinkedList<>();
         final XML obj = xmir.apply(locator);
         final ByteArrayOutputStream baos = new ByteArrayOutputStream();
         new Xsline(obj, new OutputTo(baos), new Spy.Verbose(), new ListOf<>())
@@ -124,6 +122,7 @@ public final class FaR {
             new XMLDocument(new Xembler(dirs).applyQuietly(out.node()))
         );
         Logger.debug(this, "XML output:%n%s", out);
+        final Collection<String> bugs = new LinkedList<>();
         for (final XML bug : out.nodes("/o/input[@found]")) {
             bugs.add(
                 String.format(
@@ -148,14 +147,13 @@ public final class FaR {
      * Make XSL.
      * @param name Name of it
      * @return A new XSL
-     * @throws IOException If fails
      */
-    private static XSL xsl(final String name) throws IOException {
+    private static XSL xsl(final String name) {
         final String path = String.format("org/polystat/far/%s", name);
         return new XSLDocument(
-            new TextOf(
-                new ResourceOf(
-                    path
+            new UncheckedText(
+                new TextOf(
+                    new ResourceOf(path)
                 )
             ).asString(),
             path

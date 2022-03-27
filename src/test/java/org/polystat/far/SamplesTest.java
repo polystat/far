@@ -25,7 +25,6 @@ package org.polystat.far;
 
 import com.jcabi.xml.XML;
 import com.jcabi.xml.XMLDocument;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import org.cactoos.io.ResourceOf;
@@ -67,7 +66,7 @@ final class SamplesTest {
     }
 
     @SuppressWarnings("PMD.UnusedPrivateMethod")
-    private static Collection<String> samples() throws IOException {
+    private static Collection<String> samples() throws Exception {
         return Arrays.asList(
             new TextOf(
                 new ResourceOf("xmir/03-optimize/org/polystat/far/samples")
