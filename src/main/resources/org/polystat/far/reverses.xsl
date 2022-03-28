@@ -28,6 +28,7 @@ SOFTWARE.
   object and adds <opts> elements to them.
 
   If this is the input:
+
   <o name="foo">
     <o name="a"/>
     <o name="@">
@@ -38,6 +39,7 @@ SOFTWARE.
   </o>
 
   The output will look like this:
+
   <o name="foo">
     <o name="a">
       <opts>

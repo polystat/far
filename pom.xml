@@ -35,6 +35,50 @@ SOFTWARE.
   <packaging>jar</packaging>
   <name>far</name>
   <description>Find-a-Reverse Analyzer</description>
+  <organization>
+    <name>FaR</name>
+    <url>https://www.polystat.org</url>
+  </organization>
+  <licenses>
+    <license>
+      <name>MIT</name>
+      <url>https://github.com/polystat/far/blob/master/LICENSE.txt</url>
+      <distribution>site</distribution>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>1</id>
+      <name>Yegor Bugayenko</name>
+      <email>yegor256@gmail.com</email>
+      <organization>yegor256.com</organization>
+      <organizationUrl>https://www.yegor256.com</organizationUrl>
+      <roles>
+        <role>Architect</role>
+        <role>Developer</role>
+      </roles>
+      <timezone>+3</timezone>
+    </developer>
+  </developers>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/polystat/far/issues</url>
+  </issueManagement>
+  <scm>
+    <connection>scm:git:git@github.com:polystat/far.git</connection>
+    <developerConnection>scm:git:git@github.com:polystat/far.git</developerConnection>
+    <url>https://github.com/polystat/far</url>
+  </scm>
+  <ciManagement>
+    <system>rultor</system>
+    <url>https://www.rultor.com/s/polystat/far</url>
+  </ciManagement>
+  <distributionManagement>
+    <site>
+      <id>github-pages</id>
+      <url>https://github.com/polystat/far</url>
+    </site>
+  </distributionManagement>
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -49,7 +93,7 @@ SOFTWARE.
     <dependency>
       <groupId>org.eolang</groupId>
       <artifactId>eo-parser</artifactId>
-      <version>0.22.1</version>
+      <version>0.22.2</version>
     </dependency>
     <dependency>
       <groupId>org.cactoos</groupId>
@@ -92,7 +136,7 @@ SOFTWARE.
       <plugin>
         <groupId>org.eolang</groupId>
         <artifactId>eo-maven-plugin</artifactId>
-        <version>0.22.1</version>
+        <version>0.22.2</version>
         <executions>
           <execution>
             <id>test-compile</id>

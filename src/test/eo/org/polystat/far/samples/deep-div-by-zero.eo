@@ -1,0 +1,10 @@
++package org.polystat.far
++expected 0
+
+[a] > test
+  memory > m
+  seq > @
+    m.write
+      a.add 1
+    @.org.eolang.io.stdout "Hello"
+    42.div m
