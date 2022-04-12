@@ -24,28 +24,30 @@
 
 package org.polystat.far;
 
-import com.jcabi.log.Logger;
 import com.jcabi.xml.ClasspathSources;
 import com.jcabi.xml.XML;
 import com.jcabi.xml.XMLDocument;
 import com.jcabi.xml.XSL;
 import com.jcabi.xml.XSLDocument;
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
+import com.yegor256.xsline.Shift;
+import com.yegor256.xsline.StEndless;
+import com.yegor256.xsline.StLambda;
+import com.yegor256.xsline.StRepeated;
+import com.yegor256.xsline.TrDefault;
+import com.yegor256.xsline.TrLogged;
+import com.yegor256.xsline.TrXSL;
+import com.yegor256.xsline.Train;
+import com.yegor256.xsline.Xsline;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import javax.xml.transform.stream.StreamSource;
 import org.cactoos.Func;
 import org.cactoos.io.InputStreamOf;
-import org.cactoos.io.OutputTo;
 import org.cactoos.io.ResourceOf;
 import org.cactoos.iterable.Mapped;
-import org.cactoos.list.ListOf;
 import org.cactoos.text.TextOf;
 import org.cactoos.text.UncheckedText;
-import org.eolang.parser.Spy;
-import org.eolang.parser.Xsline;
 import org.xembly.Directives;
 import org.xembly.Xembler;
 
@@ -64,64 +66,63 @@ public final class FaR {
      * @param locator Name of the object to fetch
      * @return List of errors found
      * @throws Exception If fails
-     * @todo #1:1h The current implementation of the method is not perfect,
-     *  because Xsline doesn't allow anything aside from XSL to be inside it.
-     *  I suggest we add new functionality to Xsline and let it have
-     *  not only XSL but also Cactoos Func-s inside.
+     * @checkstyle NonStaticMethodCheck (10 lines)
      */
     public Collection<String> errors(final Func<String, XML> xmir,
         final String locator) throws Exception {
         final XML obj = xmir.apply(locator);
-        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        new Xsline(obj, new OutputTo(baos), new Spy.Verbose(), new ListOf<>())
+        final Train<Shift> train = new TrXSL<>(new TrLogged(new TrDefault<>()))
             .with(FaR.xsl("expected.xsl").with("expected", "\\perp"))
             .with(FaR.xsl("data-to-attrs.xsl"))
             .with(FaR.xsl("reverses.xsl"))
             .with(
-                FaR.xsl("calculate.xsl").with(
-                    (href, base) -> new StreamSource(
-                        new InputStreamOf(
-                            new Calc(
-                                new UncheckedText(
-                                    new TextOf(
-                                        new ResourceOf(
-                                            "org/polystat/far/rules.txt"
+                new StRepeated(
+                    FaR.xsl("calculate.xsl").with(
+                        (href, base) -> new StreamSource(
+                            new InputStreamOf(
+                                new Calc(
+                                    new UncheckedText(
+                                        new TextOf(
+                                            new ResourceOf(
+                                                "org/polystat/far/rules.txt"
+                                            )
                                         )
-                                    )
-                                ).asString().trim()
-                            ).xsl().toString()
+                                    ).asString().trim()
+                                ).xsl().toString()
+                            )
                         )
-                    )
-                ),
-                (before, after) -> !after.nodes("//r").isEmpty()
+                    ),
+                    after -> !after.nodes("//r").isEmpty()
+                )
             )
             .with(FaR.xsl("cleanup-outsiders.xsl"))
             .with(FaR.xsl("taus-to-tree.xsl"))
             .with(FaR.xsl("unmatch-data.xsl").with("never", Expr.NEVER))
-            .with(
-                FaR.xsl("cleanup-conflicts.xsl"),
-                (before, after) -> !before.toString().equals(after.toString())
-            )
+            .with(new StEndless(FaR.xsl("cleanup-conflicts.xsl")))
             .with(FaR.xsl("opts-to-expressions.xsl"))
             .with(FaR.xsl("expressions-to-inputs.xsl"))
             .with(FaR.xsl("cleanup-perps.xsl"))
-            .pass();
-        XML out = new XMLDocument(
-            baos.toString(StandardCharsets.UTF_8.name())
-        );
-        final Directives dirs = new Directives();
-        final List<XML> inputs = out.nodes("/o/input");
-        for (int idx = 0; idx < inputs.size(); ++idx) {
-            final String found = new Expr(
-                inputs.get(idx).xpath("expr/text()").get(0)
-            ).find();
-            dirs.xpath(String.format("/o/input[%d]", idx + 1));
-            dirs.attr("found", found);
-        }
-        out = FaR.xsl("remove-false-inputs.xsl").transform(
-            new XMLDocument(new Xembler(dirs).applyQuietly(out.node()))
-        );
-        Logger.debug(this, "XML output:%n%s", out);
+            .with(
+                new StLambda(
+                    (integer, xml) -> {
+                        final Directives dirs = new Directives();
+                        final List<XML> inputs = xml.nodes("/o/input");
+                        for (int idx = 0; idx < inputs.size(); ++idx) {
+                            final String found = new Expr(
+                                inputs.get(idx).xpath("expr/text()").get(0)
+                            ).find();
+                            dirs.xpath(String.format("/o/input[%d]", idx + 1));
+                            dirs.attr("found", found);
+                        }
+                        return new XMLDocument(
+                            new Xembler(dirs).applyQuietly(xml.node())
+                        );
+                    }
+                )
+            )
+            .with(FaR.xsl("remove-false-inputs.xsl"))
+            .back();
+        final XML out = new Xsline(train).pass(obj);
         final Collection<String> bugs = new LinkedList<>();
         for (final XML bug : out.nodes("/o/input[@found]")) {
             bugs.add(
