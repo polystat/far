@@ -1,0 +1,7 @@
++package org.polystat.far
++expected 3
+
+[a b] > test
+  seq > @
+    @.org.eolang.io.stdout "Hello"
+    div. a b
