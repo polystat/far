@@ -81,6 +81,11 @@ SOFTWARE.
   </distributionManagement>
   <dependencies>
     <dependency>
+      <groupId>tools.aqua</groupId>
+      <artifactId>z3-turnkey</artifactId>
+      <version>4.8.17</version>
+    </dependency>
+    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <scope>runtime</scope>

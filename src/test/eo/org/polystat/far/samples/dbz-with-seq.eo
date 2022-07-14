@@ -1,5 +1,5 @@
 +package org.polystat.far
-+expected 3
++expected 0
 
 [a b] > test
   seq > @

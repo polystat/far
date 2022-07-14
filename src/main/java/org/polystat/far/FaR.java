@@ -24,24 +24,8 @@
 
 package org.polystat.far;
 
-import com.jcabi.xml.ClasspathSources;
-import com.jcabi.xml.XML;
-import com.jcabi.xml.XMLDocument;
-import com.jcabi.xml.XSL;
-import com.jcabi.xml.XSLDocument;
-import com.yegor256.xsline.Shift;
-import com.yegor256.xsline.StEndless;
-import com.yegor256.xsline.StLambda;
-import com.yegor256.xsline.StRepeated;
-import com.yegor256.xsline.TrDefault;
-import com.yegor256.xsline.TrLogged;
-import com.yegor256.xsline.TrXSL;
-import com.yegor256.xsline.Train;
-import com.yegor256.xsline.Xsline;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import javax.xml.transform.stream.StreamSource;
+import com.jcabi.xml.*;
+import com.yegor256.xsline.*;
 import org.cactoos.Func;
 import org.cactoos.io.InputStreamOf;
 import org.cactoos.io.ResourceOf;
@@ -50,6 +34,10 @@ import org.cactoos.text.TextOf;
 import org.cactoos.text.UncheckedText;
 import org.xembly.Directives;
 import org.xembly.Xembler;
+
+import javax.xml.transform.stream.StreamSource;
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * Finding bugs via reverses.
@@ -99,28 +87,41 @@ public final class FaR {
             .with(FaR.xsl("taus-to-tree.xsl"))
             .with(FaR.xsl("unmatch-data.xsl").with("never", Expr.NEVER))
             .with(new StEndless(FaR.xsl("cleanup-conflicts.xsl")))
-            .with(FaR.xsl("opts-to-expressions.xsl"))
-            .with(FaR.xsl("expressions-to-inputs.xsl"))
             .with(FaR.xsl("cleanup-perps.xsl"))
+            .with(
+                new StLambda(
+                    (integer, xml) -> new XMLDocument(
+                        new Xembler(new Expr(xml).find()).applyQuietly(xml.node())
+                    )
+                )
+            )
+            .with(FaR.xsl("opts-to-expressions.xsl"))
             .with(
                 new StLambda(
                     (integer, xml) -> {
                         final Directives dirs = new Directives();
-                        final List<XML> inputs = xml.nodes("/o/input");
-                        for (int idx = 0; idx < inputs.size(); ++idx) {
-                            final String found = new Expr(
-                                inputs.get(idx).xpath("expr/text()").get(0)
-                            ).find();
-                            dirs.xpath(String.format("/o/input[%d]", idx + 1));
-                            dirs.attr("found", found);
+                        final StringBuilder expression = new StringBuilder();
+                        for (final String var : xml.xpath("/o/input/a/@attr")) {
+                            final String path = String.format("/o/input/a[@attr='%s']", var);
+                            final String val = xml.xpath(String.format("%s/@x", path)).get(0);
+                            final String expr = xml.xpath(
+                                String.format("/o/o[@name='%s']/b[@x='%s']/text()", var, val)
+                            ).get(0);
+                            dirs.xpath(path)
+                                .set(expr);
+                            if (expression.length() != 0) {
+                                expression.append(" and ");
+                            }
+                            expression.append(expr);
                         }
+                        dirs.xpath("/o/input").add("expr").set(expression);
                         return new XMLDocument(
                             new Xembler(dirs).applyQuietly(xml.node())
                         );
                     }
                 )
             )
-            .with(FaR.xsl("remove-false-inputs.xsl"))
+            .with(FaR.xsl("cleanup-expressions.xsl"))
             .back();
         final XML out = new Xsline(train).pass(obj);
         final Collection<String> bugs = new LinkedList<>();
@@ -146,6 +147,7 @@ public final class FaR {
 
     /**
      * Make XSL.
+     *
      * @param name Name of it
      * @return A new XSL
      */

@@ -29,7 +29,7 @@ SOFTWARE.
   situation is impossible: \perp can't come in as a value.
   -->
   <xsl:strip-space elements="*"/>
-  <xsl:template match="input[a[@x = '\perp']]">
+  <xsl:template match="opt[@x = '\perp']">
     <!-- just delete it -->
   </xsl:template>
   <xsl:template match="node()|@*">
