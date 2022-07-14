@@ -24,8 +24,23 @@
 
 package org.polystat.far;
 
-import com.jcabi.xml.*;
-import com.yegor256.xsline.*;
+import com.jcabi.xml.ClasspathSources;
+import com.jcabi.xml.XML;
+import com.jcabi.xml.XMLDocument;
+import com.jcabi.xml.XSL;
+import com.jcabi.xml.XSLDocument;
+import com.yegor256.xsline.Shift;
+import com.yegor256.xsline.StEndless;
+import com.yegor256.xsline.StLambda;
+import com.yegor256.xsline.StRepeated;
+import com.yegor256.xsline.TrDefault;
+import com.yegor256.xsline.TrLogged;
+import com.yegor256.xsline.TrXSL;
+import com.yegor256.xsline.Train;
+import com.yegor256.xsline.Xsline;
+import java.util.Collection;
+import java.util.LinkedList;
+import javax.xml.transform.stream.StreamSource;
 import org.cactoos.Func;
 import org.cactoos.io.InputStreamOf;
 import org.cactoos.io.ResourceOf;
@@ -34,10 +49,6 @@ import org.cactoos.text.TextOf;
 import org.cactoos.text.UncheckedText;
 import org.xembly.Directives;
 import org.xembly.Xembler;
-
-import javax.xml.transform.stream.StreamSource;
-import java.util.Collection;
-import java.util.LinkedList;
 
 /**
  * Finding bugs via reverses.

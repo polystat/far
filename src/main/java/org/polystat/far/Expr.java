@@ -25,10 +25,18 @@
 package org.polystat.far;
 
 import com.jcabi.xml.XML;
-import com.microsoft.z3.*;
+import com.microsoft.z3.BoolExpr;
+import com.microsoft.z3.Context;
+import com.microsoft.z3.Model;
+import com.microsoft.z3.Solver;
+import com.microsoft.z3.Status;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.xembly.Directives;
-
-import java.util.*;
 
 /**
  * Boolean Expression Solver.
@@ -133,6 +141,17 @@ public final class Expr {
             } else {
                 result = CTX.mkOr(result, cur);
             }
+        }
+        if (result != null) {
+            result = CTX.mkAnd(
+                result,
+                CTX.mkNot(
+                    CTX.mkEq(
+                        CTX.mkConst(name, CTX.getStringSort()),
+                        CTX.mkString("NONE")
+                    )
+                )
+            );
         }
         return result;
     }
