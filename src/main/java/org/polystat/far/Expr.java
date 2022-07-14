@@ -88,8 +88,18 @@ public final class Expr {
         final Solver slv = CTX.mkSolver();
         final List<BoolExpr> list = new ArrayList<>(0);
         for (final XML obj : this.xml.nodes("o/o")) {
-            final BoolExpr cur = opts(obj);
-            list.add(cur);
+            final String name = obj.xpath("@name").get(0);
+            BoolExpr equation = CTX.mkNot(
+                CTX.mkEq(
+                    CTX.mkConst(name, CTX.getStringSort()),
+                    CTX.mkString("NONE")
+                )
+            );
+            final BoolExpr cur = opts(obj, name);
+            if (!cur.isFalse()) {
+                equation = CTX.mkAnd(cur, equation);
+            }
+            list.add(equation);
         }
         list.add(this.mkVariables());
         slv.add(list.toArray(new BoolExpr[0]));
@@ -113,11 +123,11 @@ public final class Expr {
     /**
      * Parse opts tags.
      * @param xml Current XML block
+     * @param name Attr name of current XML block
      * @return BoolExpr of current block
      */
-    private static BoolExpr opts(final XML xml) {
+    private static BoolExpr opts(final XML xml, final String name) {
         BoolExpr result = CTX.mkFalse();
-        final String name = xml.xpath("@name").get(0);
         final List<Map<String, BoolExpr>> obj = new ArrayList<>(0);
         for (final XML opts : xml.nodes("opts")) {
             obj.add(opt(opts));
@@ -136,15 +146,6 @@ public final class Expr {
             );
             result = CTX.mkOr(result, cur);
         }
-        result = CTX.mkAnd(
-            result,
-            CTX.mkNot(
-                CTX.mkEq(
-                    CTX.mkConst(name, CTX.getStringSort()),
-                    CTX.mkString("NONE")
-                )
-            )
-        );
         return result;
     }
 
@@ -157,9 +158,8 @@ public final class Expr {
         final Map<String, BoolExpr> result = new HashMap<>();
         for (final XML opt : xml.nodes("opt")) {
             final String val = opt.xpath("@x").get(0);
-            final BoolExpr cur = taus(opt);
             final BoolExpr old = result.getOrDefault(val, CTX.mkFalse());
-            result.put(val, CTX.mkOr(cur, old));
+            result.put(val, CTX.mkOr(taus(opt), old));
         }
         return result;
     }
@@ -220,7 +220,7 @@ public final class Expr {
             final String path = String.format("/o/o/opts/opt/tau[@i='%s']/text()", var);
             variables.get(name).addAll(this.xml.xpath(path));
         }
-        BoolExpr result = CTX.mkAnd();
+        BoolExpr result = CTX.mkTrue();
         for (final String var : variables.keySet()) {
             BoolExpr cur = CTX.mkFalse();
             for (final String val : variables.get(var)) {
