@@ -22,25 +22,13 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" id="remove-false-inputs" version="2.0">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" id="cleanup-expressions" version="2.0">
   <!--
-  This XSL simply deletes the <input> elements that don't have
-  the required @found attribute. When the attribute is found, it
-  modifies it taking only the last part of it, after the last
-  right-arrow.
-  -->
+    This XSL deletes all <b> elements.
+    -->
   <xsl:strip-space elements="*"/>
-  <xsl:template match="input[@found='']">
-    <!-- remove it -->
-  </xsl:template>
-  <xsl:template match="input[@found!='']">
-    <xsl:copy>
-      <xsl:attribute name="found">
-        <xsl:variable name="parts" select="tokenize(@found, ' &#x279C; ')"/>
-        <xsl:value-of select="$parts[count($parts)]"/>
-      </xsl:attribute>
-      <xsl:apply-templates select="node()|@* except @found"/>
-    </xsl:copy>
+  <xsl:template match="b">
+    <!-- just delete it -->
   </xsl:template>
   <xsl:template match="node()|@*">
     <xsl:copy>

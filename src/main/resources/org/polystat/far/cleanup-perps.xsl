@@ -24,12 +24,11 @@ SOFTWARE.
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" id="cleanup-perps" version="2.0">
   <!--
-  This XSL deletes all <input> elements, which have at least
-  one variable with \perp value. It's obvious, that such a
+  This XSL deletes all <opt> elements, which variable is \perp value. It's obvious, that such a
   situation is impossible: \perp can't come in as a value.
   -->
   <xsl:strip-space elements="*"/>
-  <xsl:template match="input[a[@x = '\perp']]">
+  <xsl:template match="opt[@x = '\perp']">
     <!-- just delete it -->
   </xsl:template>
   <xsl:template match="node()|@*">
