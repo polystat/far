@@ -47,7 +47,7 @@ final class SamplesTest {
 
     @ParameterizedTest
     @MethodSource("samples")
-    public void testPacks(final String xmir) throws Exception {
+    void testPacks(final String xmir) throws Exception {
         final String res = String.format(
             "xmir/03-optimize/org/polystat/far/samples/%s",
             xmir

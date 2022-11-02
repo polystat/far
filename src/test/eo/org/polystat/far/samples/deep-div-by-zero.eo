@@ -5,6 +5,6 @@
   memory > m
   seq > @
     m.write
-      a.add 1
+      a.plus 1
     @.org.eolang.io.stdout "Hello"
     42.div m

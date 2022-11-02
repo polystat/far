@@ -27,7 +27,7 @@ SOFTWARE.
   <parent>
     <groupId>com.jcabi</groupId>
     <artifactId>parent</artifactId>
-    <version>0.57.2</version>
+    <version>0.63.2</version>
   </parent>
   <groupId>org.polystat</groupId>
   <artifactId>far</artifactId>
@@ -83,11 +83,12 @@ SOFTWARE.
     <dependency>
       <groupId>tools.aqua</groupId>
       <artifactId>z3-turnkey</artifactId>
-      <version>4.8.17</version>
+      <version>4.11.2</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
+      <version>2.0.3</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -104,17 +105,17 @@ SOFTWARE.
     <dependency>
       <groupId>com.yegor256</groupId>
       <artifactId>xsline</artifactId>
-      <version>0.5.0</version>
+      <version>0.15.0</version>
     </dependency>
     <dependency>
       <groupId>org.cactoos</groupId>
       <artifactId>cactoos</artifactId>
-      <version>0.50</version>
+      <version>0.54.0</version>
     </dependency>
     <dependency>
       <groupId>com.jcabi.incubator</groupId>
       <artifactId>xembly</artifactId>
-      <version>0.25.0</version>
+      <version>0.28.1</version>
     </dependency>
     <dependency>
       <groupId>com.jcabi</groupId>
@@ -132,7 +133,7 @@ SOFTWARE.
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-params</artifactId>
-      <version>5.6.2</version>
+      <version>5.9.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -147,7 +148,7 @@ SOFTWARE.
       <plugin>
         <groupId>org.eolang</groupId>
         <artifactId>eo-maven-plugin</artifactId>
-        <version>0.22.2</version>
+        <version>0.28.10</version>
         <executions>
           <execution>
             <id>test-compile</id>

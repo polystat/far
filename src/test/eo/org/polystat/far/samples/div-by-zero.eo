@@ -2,7 +2,7 @@
 +expected 1
 
 [a b] > test
-  add. > @
+  plus. > @
     div. a b
     div.
       div. b a
