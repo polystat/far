@@ -41,12 +41,12 @@ final class CalcTest {
     @Test
     void buildsSimpleRulesXsl() {
         MatcherAssert.assertThat(
-            XhtmlMatchers.xhtml(new Calc("add(y) -> {{y 0}}").xsl()),
+            XhtmlMatchers.xhtml(new Calc("plus(y) -> {{y 0}}").xsl()),
             Matchers.allOf(
                 XhtmlMatchers.hasXPath("//xsl:stylesheet"),
                 XhtmlMatchers.hasXPath("//xsl:function[@name='ps:calc']"),
                 XhtmlMatchers.hasXPath("//xsl:when[@test=\"$y = '\\any'\"]"),
-                XhtmlMatchers.hasXPath("//xsl:when[@test=\"$func = 'add'\"]")
+                XhtmlMatchers.hasXPath("//xsl:when[@test=\"$func = 'plus'\"]")
             )
         );
     }
@@ -65,7 +65,7 @@ final class CalcTest {
                     ).asString().trim()
                 ).xsl()
             ),
-            XhtmlMatchers.hasXPath("//xsl:choose[count(xsl:when)=7]")
+            XhtmlMatchers.hasXPath("//xsl:choose[count(xsl:when)=11]")
         );
     }
 

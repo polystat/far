@@ -1,0 +1,13 @@
++package org.polystat.far
++expected 0
+
+[x] > test
+  div. > @
+    100
+    times.
+      100
+      plus.
+        100
+        minus.
+          100
+          x

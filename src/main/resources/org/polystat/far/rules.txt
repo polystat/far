@@ -5,3 +5,7 @@
 .eq(true) -> {{0 0} {17 17}}
 .eq(false) -> {{19 0} {0 19}}
 .if(\perp) -> {{true \perp \any} {false \any \perp}}
+.times(\perp) -> {{\any \perp} {\perp \any}}
+.times(y) -> {{1 y}}
+.minus(\perp) -> {{\any \perp} {\perp \any}}
+.minus(y) -> {{0 y}}

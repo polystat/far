@@ -1,0 +1,7 @@
++package org.polystat.far
++expected 1
+
+[x] > test
+  div. > @
+    100
+    arr.length
