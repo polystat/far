@@ -12,19 +12,19 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-2022, ubuntu-20.04]
-        java: [1.8, 11, 13]
+        os: [ubuntu-20.04, windows-2022, macos-12]
+        java: [11, 17]
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java }}
-      - uses: actions/cache@v1
+      - uses: actions/cache@v3
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-jdk-${{ matrix.java }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-jdk-${{ matrix.java }}-maven-
       - name: Build it with Maven
-        run: mvn -B verify -Pqulice
+        run: mvn clean install -Pqulice --errors --batch-mode
