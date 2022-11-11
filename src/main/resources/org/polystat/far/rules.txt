@@ -8,4 +8,4 @@
 .times(\perp) -> {{\any \perp} {\perp \any}}
 .times(y) -> {{1 y}}
 .minus(\perp) -> {{\any \perp} {\perp \any}}
-.minus(y) -> {{0 y}}
+.minus(y) -> {{y 0}}
