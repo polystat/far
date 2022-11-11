@@ -23,7 +23,7 @@ jobs:
           restore-keys: |
             maven-
       - name: Run tests
-        run: mvn -B verify -Pjacoco
+      - run: mvn install -Pjacoco
       - name: Upload coverage to Codecov
       - uses: codecov/codecov-action@v3
         with:
