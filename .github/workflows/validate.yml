@@ -3,8 +3,12 @@ name: С++ division by zero validation
 on:
   push:
     branches: [ "master" ]
+    paths:
+      - examples/**
   pull_request:
     branches: [ "master" ]
+    paths:
+      - examples/**
 
 jobs:
   validate:
