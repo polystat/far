@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -euox pipefail
 file=$1
 
 echo "Pull c2eo Docker image"
