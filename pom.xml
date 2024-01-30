@@ -83,7 +83,7 @@ SOFTWARE.
     <dependency>
       <groupId>tools.aqua</groupId>
       <artifactId>z3-turnkey</artifactId>
-      <version>4.11.2</version>
+      <version>4.12.5</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
