@@ -1,0 +1,6 @@
+package examples.org.eolang
+
+[x] > global
+  div. > @
+    42
+    x
