@@ -1,0 +1,15 @@
+version = 1
+SPDX-PackageName = "far"
+SPDX-PackageSupplier = "Yegor Bugayenko <yegor256@gmail.com>"
+SPDX-PackageDownloadLocation = "https://github.com/polystat/far"
+
+[[annotations]]
+path = [
+  ".pdd",
+  "README.md",
+  "renovate.json",
+  "src/main/resources/org/polystat/far/rules.txt",
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Copyright (c) 2020-2021 Polystat.org"
+SPDX-License-Identifier = "MIT"
