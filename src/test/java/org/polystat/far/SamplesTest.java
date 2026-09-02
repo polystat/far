@@ -23,12 +23,12 @@
  */
 package org.polystat.far;
 
-import com.jcabi.xml.XML;
 import com.jcabi.xml.XMLDocument;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.regex.Pattern;
 import org.cactoos.io.ResourceOf;
 import org.cactoos.text.TextOf;
 import org.cactoos.text.UncheckedText;
@@ -40,7 +40,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Test case for {@link FaR}.
- *
  * @since 0.4
  */
 final class SamplesTest {
@@ -52,24 +51,18 @@ final class SamplesTest {
             "xmir/03-optimize/org/polystat/far/samples/%s",
             xmir
         );
-        final FaR far = new FaR();
-        final Collection<String> bugs = far.errors(
-            new Program(res), "\\Phi.test"
-        );
-        final XML xml = new XMLDocument(
-            new TextOf(new ResourceOf(res)).asString()
-        );
         MatcherAssert.assertThat(
-            bugs.size(),
+            new FaR().errors(new Program(res), "\\Phi.test").size(),
             Matchers.equalTo(
                 Integer.parseInt(
-                    xml.xpath("//meta[head='expected']/tail/text()").get(0)
+                    new XMLDocument(
+                        new TextOf(new ResourceOf(res)).asString()
+                    ).xpath("//meta[head='expected']/tail/text()").get(0)
                 )
             )
         );
     }
 
-    @SuppressWarnings("PMD.UnusedPrivateMethod")
     private static Collection<String> samples() {
         Assumptions.assumeTrue(
             Files.exists(
@@ -78,12 +71,13 @@ final class SamplesTest {
             "You must run 'mvn test' beforehand"
         );
         return Arrays.asList(
-            new UncheckedText(
-                new TextOf(
-                    new ResourceOf("xmir/03-optimize/org/polystat/far/samples")
-                )
-            ).asString().split("\n")
+            Pattern.compile("\\R").split(
+                new UncheckedText(
+                    new TextOf(
+                        new ResourceOf("xmir/03-optimize/org/polystat/far/samples")
+                    )
+                ).asString()
+            )
         );
     }
-
 }

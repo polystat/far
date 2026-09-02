@@ -33,7 +33,6 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test case for {@link Calc}.
- *
  * @since 0.1
  */
 final class CalcTest {
@@ -68,5 +67,4 @@ final class CalcTest {
             XhtmlMatchers.hasXPath("//xsl:choose[count(xsl:when)=11]")
         );
     }
-
 }

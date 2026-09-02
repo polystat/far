@@ -31,7 +31,6 @@ import org.cactoos.text.TextOf;
 
 /**
  * Simulator of a real program from Polystat.
- *
  * @since 0.4
  */
 final class Program implements Func<String, XML> {
@@ -51,7 +50,7 @@ final class Program implements Func<String, XML> {
 
     @Override
     public XML apply(final String name) throws Exception {
-        final String[] parts = name.split("\\.");
+        final String[] parts = name.split("\\.", -1);
         if (!"\\Phi".equals(parts[0])) {
             throw new IllegalArgumentException(
                 String.format(
@@ -68,14 +67,14 @@ final class Program implements Func<String, XML> {
                 )
             );
         }
-        final XML xml = new XMLDocument(
-            new TextOf(
-                new ResourceOf(this.res)
-            ).asString()
-        );
         return new XMLDocument(
-            xml.nodes(String.format("//o[@name='%s']", parts[1])).get(0).deepCopy()
+            new XMLDocument(
+                new TextOf(
+                    new ResourceOf(this.res)
+                ).asString()
+            ).nodes(
+                String.format("//o[@name='%s']", parts[1])
+            ).get(0).deepCopy()
         );
     }
-
 }

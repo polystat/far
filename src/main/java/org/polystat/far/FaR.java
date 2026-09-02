@@ -36,10 +36,9 @@ import com.yegor256.xsline.StRepeated;
 import com.yegor256.xsline.TrDefault;
 import com.yegor256.xsline.TrLogged;
 import com.yegor256.xsline.TrXSL;
-import com.yegor256.xsline.Train;
 import com.yegor256.xsline.Xsline;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import javax.xml.transform.stream.StreamSource;
 import org.cactoos.Func;
 import org.cactoos.io.InputStreamOf;
@@ -52,15 +51,19 @@ import org.xembly.Xembler;
 
 /**
  * Finding bugs via reverses.
- *
  * @since 1.0
- * @checkstyle ClassDataAbstractionCouplingCheck (500 lines)
  */
 public final class FaR {
 
     /**
+     * Ctor.
+     */
+    public FaR() {
+        // nothing to initialize
+    }
+
+    /**
      * Find all errors.
-     *
      * @param xmir The program
      * @param locator Name of the object to fetch
      * @return List of errors found
@@ -69,73 +72,24 @@ public final class FaR {
      */
     public Collection<String> errors(final Func<String, XML> xmir,
         final String locator) throws Exception {
-        final XML obj = xmir.apply(locator);
-        final Train<Shift> train = new TrXSL<>(new TrLogged(new TrDefault<>()))
-            .with(FaR.xsl("expected.xsl").with("expected", "\\perp"))
-            .with(FaR.xsl("data-to-attrs.xsl"))
-            .with(FaR.xsl("reverses.xsl"))
-            .with(
-                new StRepeated(
-                    FaR.xsl("calculate.xsl").with(
-                        (href, base) -> new StreamSource(
-                            new InputStreamOf(
-                                new Calc(
-                                    new UncheckedText(
-                                        new TextOf(
-                                            new ResourceOf(
-                                                "org/polystat/far/rules.txt"
-                                            )
-                                        )
-                                    ).asString().trim()
-                                ).xsl().toString()
-                            )
-                        )
-                    ),
-                    after -> !after.nodes("//r").isEmpty()
-                )
-            )
-            .with(FaR.xsl("cleanup-outsiders.xsl"))
-            .with(FaR.xsl("taus-to-tree.xsl"))
-            .with(FaR.xsl("unmatch-data.xsl").with("never", Expr.NEVER))
-            .with(new StEndless(FaR.xsl("cleanup-conflicts.xsl")))
-            .with(FaR.xsl("cleanup-perps.xsl"))
-            .with(
-                new StLambda(
-                    (integer, xml) -> new XMLDocument(
-                        new Xembler(new Expr(xml).find()).applyQuietly(xml.deepCopy())
-                    )
-                )
-            )
-            .with(FaR.xsl("opts-to-expressions.xsl"))
-            .with(
-                new StLambda(
-                    (integer, xml) -> {
-                        final Directives dirs = new Directives();
-                        final StringBuilder expression = new StringBuilder();
-                        for (final String var : xml.xpath("/o/input/a/@attr")) {
-                            final String path = String.format("/o/input/a[@attr='%s']", var);
-                            final String val = xml.xpath(String.format("%s/@x", path)).get(0);
-                            final String expr = xml.xpath(
-                                String.format("/o/o[@name='%s']/b[@x='%s']/text()", var, val)
-                            ).get(0);
-                            dirs.xpath(path)
-                                .set(expr);
-                            if (expression.length() != 0) {
-                                expression.append(" and ");
-                            }
-                            expression.append(expr);
-                        }
-                        dirs.xpath("/o/input").add("expr").set(expression);
-                        return new XMLDocument(
-                            new Xembler(dirs).applyQuietly(xml.deepCopy())
-                        );
-                    }
-                )
-            )
-            .with(FaR.xsl("cleanup-expressions.xsl"))
-            .back();
-        final XML out = new Xsline(train).pass(obj);
-        final Collection<String> bugs = new LinkedList<>();
+        final XML out = new Xsline(
+            new TrXSL<>(new TrLogged(new TrDefault<>()))
+                .with(FaR.xsl("expected.xsl").with("expected", "\\perp"))
+                .with(FaR.xsl("data-to-attrs.xsl"))
+                .with(FaR.xsl("reverses.xsl"))
+                .with(FaR.calculation())
+                .with(FaR.xsl("cleanup-outsiders.xsl"))
+                .with(FaR.xsl("taus-to-tree.xsl"))
+                .with(FaR.xsl("unmatch-data.xsl").with("never", Expr.NEVER))
+                .with(new StEndless(FaR.xsl("cleanup-conflicts.xsl")))
+                .with(FaR.xsl("cleanup-perps.xsl"))
+                .with(FaR.solution())
+                .with(FaR.xsl("opts-to-expressions.xsl"))
+                .with(FaR.expression())
+                .with(FaR.xsl("cleanup-expressions.xsl"))
+                .back()
+        ).pass(xmir.apply(locator));
+        final Collection<String> bugs = new ArrayList<>(0);
         for (final XML bug : out.nodes("/o/input[@found]")) {
             bugs.add(
                 String.format(
@@ -156,12 +110,59 @@ public final class FaR {
         return bugs;
     }
 
-    /**
-     * Make XSL.
-     *
-     * @param name Name of it
-     * @return A new XSL
-     */
+    private static Shift calculation() {
+        return new StRepeated(
+            FaR.xsl("calculate.xsl").with(
+                (href, base) -> new StreamSource(
+                    new InputStreamOf(
+                        new Calc(
+                            new UncheckedText(
+                                new TextOf(
+                                    new ResourceOf("org/polystat/far/rules.txt")
+                                )
+                            ).asString().trim()
+                        ).xsl().toString()
+                    )
+                )
+            ),
+            after -> !after.nodes("//r").isEmpty()
+        );
+    }
+
+    private static Shift solution() {
+        return new StLambda(
+            (integer, xml) -> new XMLDocument(
+                new Xembler(new Expr(xml).find()).applyQuietly(xml.deepCopy())
+            )
+        );
+    }
+
+    private static Shift expression() {
+        return new StLambda(
+            (integer, xml) -> new XMLDocument(
+                new Xembler(FaR.inputs(xml)).applyQuietly(xml.deepCopy())
+            )
+        );
+    }
+
+    private static Directives inputs(final XML xml) {
+        final Directives dirs = new Directives();
+        final StringBuilder expression = new StringBuilder();
+        for (final String attr : xml.xpath("/o/input/a/@attr")) {
+            final String path = String.format("/o/input/a[@attr='%s']", attr);
+            final String val = xml.xpath(String.format("%s/@x", path)).get(0);
+            final String expr = xml.xpath(
+                String.format("/o/o[@name='%s']/b[@x='%s']/text()", attr, val)
+            ).get(0);
+            dirs.xpath(path).set(expr);
+            if (expression.length() != 0) {
+                expression.append(" and ");
+            }
+            expression.append(expr);
+        }
+        return dirs.xpath("/o/input").add("expr").set(expression);
+    }
+
     private static XSL xsl(final String name) {
         final String path = String.format("org/polystat/far/%s", name);
         return new XSLDocument(
@@ -173,5 +174,4 @@ public final class FaR {
             path
         ).with(new ClasspathSources());
     }
-
 }

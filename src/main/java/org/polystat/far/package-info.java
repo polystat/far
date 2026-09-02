@@ -24,7 +24,6 @@
 
 /**
  * FAR.
- *
  * @since 0.1
  */
 package org.polystat.far;

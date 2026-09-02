@@ -24,7 +24,6 @@
 
 package org.polystat.far;
 
-import com.jcabi.xml.XML;
 import com.jcabi.xml.XMLDocument;
 import com.jcabi.xml.XSL;
 import com.jcabi.xml.XSLDocument;
@@ -41,9 +40,7 @@ import org.xembly.Xembler;
 
 /**
  * Make XSL from rules.txt.
- *
  * @since 1.0
- * @checkstyle ClassDataAbstractionCouplingCheck (500 lines)
  */
 public final class Calc {
 
@@ -60,6 +57,16 @@ public final class Calc {
     private static final Pattern RIGHT = Pattern.compile(
         "\\{([^}^{]+)}"
     );
+
+    /**
+     * Line break between rules.
+     */
+    private static final Pattern EOL = Pattern.compile("\\R");
+
+    /**
+     * Arrow between the left and the right parts of a rule.
+     */
+    private static final Pattern ARROW = Pattern.compile(" -> ");
 
     /**
      * Text rules.
@@ -79,18 +86,6 @@ public final class Calc {
      * @return The XSL
      */
     public XSL xsl() {
-        final XML xml = new XMLDocument(
-            new Xembler(
-                new Directives().add("rules").append(
-                    new Joined<>(
-                        new Mapped<>(
-                            Calc::toDirs,
-                            new IterableOf<>(this.rules.split("\n"))
-                        )
-                    )
-                )
-            ).domQuietly()
-        );
         return new XSLDocument(
             new XSLDocument(
                 new UncheckedText(
@@ -101,18 +96,26 @@ public final class Calc {
                     )
                 ).asString(),
                 "build-calc-function.xsl"
-            ).applyTo(xml),
+            ).applyTo(
+                new XMLDocument(
+                    new Xembler(
+                        new Directives().add("rules").append(
+                            new Joined<>(
+                                new Mapped<>(
+                                    Calc::toDirs,
+                                    new IterableOf<>(Calc.EOL.split(this.rules))
+                                )
+                            )
+                        )
+                    ).domQuietly()
+                )
+            ),
             "calc-function.xsl"
         );
     }
 
-    /**
-     * Turn a rule into Xembly directives.
-     * @param rule The rule in text
-     * @return Directives
-     */
     private static Directives toDirs(final String rule) {
-        final String[] parts = rule.split(" -> ");
+        final String[] parts = Calc.ARROW.split(rule, -1);
         final Matcher left = Calc.LEFT.matcher(parts[0]);
         if (!left.matches()) {
             throw new IllegalStateException(
@@ -126,7 +129,7 @@ public final class Calc {
             .add("inputs");
         while (right.find()) {
             dirs.add("input");
-            final String[] inputs = right.group(1).split(" ");
+            final String[] inputs = right.group(1).split(" ", -1);
             for (final String input : inputs) {
                 dirs.add("x").set(input).up();
             }
@@ -134,5 +137,4 @@ public final class Calc {
         }
         return dirs.up().up();
     }
-
 }

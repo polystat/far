@@ -43,6 +43,7 @@ import org.xembly.Directives;
  * @since 1.1
  */
 public final class Expr {
+
     /**
      * NONE.
      */
@@ -54,7 +55,7 @@ public final class Expr {
     private static final Map<String, String> RULES = new HashMap<>();
 
     static {
-        RULES.put("model", "true");
+        Expr.RULES.put("model", "true");
     }
 
     /**
@@ -84,20 +85,20 @@ public final class Expr {
      * Make it.
      * @return Directives
      */
-    public Directives find()  {
-        final Solver slv = CTX.mkSolver();
+    public Directives find() {
+        final Solver slv = Expr.CTX.mkSolver();
         final List<BoolExpr> list = new ArrayList<>(0);
         for (final XML obj : this.xml.nodes("o/o")) {
             final String name = obj.xpath("@name").get(0);
-            BoolExpr equation = CTX.mkNot(
-                CTX.mkEq(
-                    CTX.mkConst(name, CTX.getStringSort()),
-                    CTX.mkString("NONE")
+            BoolExpr equation = Expr.CTX.mkNot(
+                Expr.CTX.mkEq(
+                    Expr.CTX.mkConst(name, Expr.CTX.getStringSort()),
+                    Expr.CTX.mkString("NONE")
                 )
             );
-            final BoolExpr cur = opts(obj, name);
+            final BoolExpr cur = Expr.opts(obj, name);
             if (!cur.isFalse()) {
-                equation = CTX.mkAnd(cur, equation);
+                equation = Expr.CTX.mkAnd(cur, equation);
             }
             list.add(equation);
         }
@@ -107,12 +108,11 @@ public final class Expr {
         if (slv.check() == Status.SATISFIABLE) {
             final Model model = slv.getModel();
             dirs.xpath("o").add("input").attr("found", this.found(model));
-            for (final String var : this.xml.xpath("/o/o/@name")) {
-                String val = model.evaluate(CTX.mkConst(var, CTX.getStringSort()), true).toString();
-                val = val.substring(1, val.length() - 1);
+            for (final String attr : this.xml.xpath("/o/o/@name")) {
+                final String val = Expr.evaluated(model, attr);
                 if (!val.isEmpty()) {
                     dirs.xpath("/o/input").add("a")
-                        .attr("attr", var)
+                        .attr("attr", attr)
                         .attr("x", val);
                 }
             }
@@ -120,158 +120,121 @@ public final class Expr {
         return dirs;
     }
 
-    /**
-     * Parse opts tags.
-     * @param xml Current XML block
-     * @param name Attr name of current XML block
-     * @return BoolExpr of current block
-     */
     private static BoolExpr opts(final XML xml, final String name) {
-        BoolExpr result = CTX.mkFalse();
+        BoolExpr result = Expr.CTX.mkFalse();
         final List<Map<String, BoolExpr>> obj = new ArrayList<>(0);
         for (final XML opts : xml.nodes("opts")) {
-            obj.add(opt(opts));
+            obj.add(Expr.opt(opts));
         }
-        final Set<String> values = values(obj);
+        final Set<String> values = Expr.values(obj);
         for (final String val : values) {
-            if (!possible(obj, val)) {
+            if (!Expr.possible(obj, val)) {
                 continue;
             }
-            final BoolExpr cur = CTX.mkAnd(
-                CTX.mkEq(
-                    CTX.mkConst(name, CTX.getStringSort()),
-                    CTX.mkString(val)
+            final BoolExpr cur = Expr.CTX.mkAnd(
+                Expr.CTX.mkEq(
+                    Expr.CTX.mkConst(name, Expr.CTX.getStringSort()),
+                    Expr.CTX.mkString(val)
                 ),
-                mkNegations(obj, val)
+                Expr.mkNegations(obj, val)
             );
-            result = CTX.mkOr(result, cur);
+            result = Expr.CTX.mkOr(result, cur);
         }
         return result;
     }
 
-    /**
-     * Parse opt tags of current opts block.
-     * @param xml Current XML block
-     * @return Set of all value of opt and its BoolExpr
-     */
     private static Map<String, BoolExpr> opt(final XML xml) {
         final Map<String, BoolExpr> result = new HashMap<>();
         for (final XML opt : xml.nodes("opt")) {
             final String val = opt.xpath("@x").get(0);
-            final BoolExpr old = result.getOrDefault(val, CTX.mkFalse());
-            result.put(val, CTX.mkOr(taus(opt), old));
+            final BoolExpr old = result.getOrDefault(val, Expr.CTX.mkFalse());
+            result.put(val, Expr.CTX.mkOr(Expr.taus(opt), old));
         }
         return result;
     }
 
-    /**
-     * Parse tau tags of current opt block.
-     * @param xml Current XML block
-     * @return BoolExpr of this opt block
-     */
     private static BoolExpr taus(final XML xml) {
-        BoolExpr result = CTX.mkTrue();
+        BoolExpr result = Expr.CTX.mkTrue();
         for (final XML tau : xml.nodes("tau")) {
-            final String var = tau.xpath("@i").get(0).split(":")[0];
+            final String name = tau.xpath("@i").get(0).split(":", -1)[0];
             final String val = tau.xpath("text()").get(0);
-            final BoolExpr cur = CTX.mkEq(
-                CTX.mkConst(var, CTX.mkStringSort()),
-                CTX.mkString(val)
+            final BoolExpr cur = Expr.CTX.mkEq(
+                Expr.CTX.mkConst(name, Expr.CTX.mkStringSort()),
+                Expr.CTX.mkString(val)
             );
-            result = CTX.mkAnd(result, cur);
+            result = Expr.CTX.mkAnd(result, cur);
         }
         return result;
     }
 
-    /**
-     * Solution of Boolean Expressions consisting all tau variables.
-     * @param model Model
-     * @return Representation of an expression in a string
-     */
     private String found(final Model model) {
-        final Set<String> vars = new HashSet<>();
+        final Set<String> names = new HashSet<>();
         final StringBuilder result = new StringBuilder();
-        for (final String var : this.xml.xpath(Expr.TAU_PATH)) {
-            vars.add(var.split(":")[0]);
+        for (final String tau : this.xml.xpath(Expr.TAU_PATH)) {
+            names.add(tau.split(":", -1)[0]);
         }
-        for (final String var : vars) {
-            String val = model.evaluate(CTX.mkConst(var, CTX.getStringSort()), true).toString();
-            val = val.substring(1, val.length() - 1);
-            result.append("\uD835\uDF0F")
-                .append(var)
+        for (final String name : names) {
+            result.append("𝜏")
+                .append(name)
                 .append('=')
-                .append(val)
+                .append(Expr.evaluated(model, name))
                 .append(' ');
         }
         result.setLength(result.length() - 1);
         return result.toString();
     }
 
-    /**
-     * Makes a BoolExpr of all possible values of tau.
-     * @return BoolExpr
-     */
     private BoolExpr mkVariables() {
-        final List<String> vars = this.xml.xpath(Expr.TAU_PATH);
         final Map<String, Set<String>> variables = new HashMap<>();
-        for (final String var : vars) {
-            final String name = var.split(":")[0];
+        for (final String tau : this.xml.xpath(Expr.TAU_PATH)) {
+            final String name = tau.split(":", -1)[0];
             variables.putIfAbsent(name, new HashSet<>());
-            final String path = String.format("/o/o/opts/opt/tau[@i='%s']/text()", var);
-            variables.get(name).addAll(this.xml.xpath(path));
+            variables.get(name).addAll(
+                this.xml.xpath(
+                    String.format("/o/o/opts/opt/tau[@i='%s']/text()", tau)
+                )
+            );
         }
-        BoolExpr result = CTX.mkTrue();
-        for (final String var : variables.keySet()) {
-            BoolExpr cur = CTX.mkFalse();
-            for (final String val : variables.get(var)) {
-                final BoolExpr expr = CTX.mkEq(
-                    CTX.mkConst(var, CTX.getStringSort()),
-                    CTX.mkString(val)
+        BoolExpr result = Expr.CTX.mkTrue();
+        for (final String name : variables.keySet()) {
+            BoolExpr cur = Expr.CTX.mkFalse();
+            for (final String val : variables.get(name)) {
+                final BoolExpr expr = Expr.CTX.mkEq(
+                    Expr.CTX.mkConst(name, Expr.CTX.getStringSort()),
+                    Expr.CTX.mkString(val)
                 );
-                cur = CTX.mkOr(cur, expr);
+                cur = Expr.CTX.mkOr(cur, expr);
             }
-            result = CTX.mkAnd(result, cur);
+            result = Expr.CTX.mkAnd(result, cur);
         }
         return result;
     }
 
-    /**
-     * Makes a BoolExpr of current o-tag with negations of all values, that do not match to val.
-     * @param obj Parsed o-tag
-     * @param val Value of o-tag
-     * @return BoolExpr
-     */
     private static BoolExpr mkNegations(final List<Map<String, BoolExpr>> obj, final String val) {
-        BoolExpr result = CTX.mkTrue();
+        BoolExpr result = Expr.CTX.mkTrue();
         for (final Map<String, BoolExpr> opt : obj) {
-            BoolExpr negations = CTX.mkFalse();
-            BoolExpr cur = CTX.mkFalse();
+            BoolExpr negations = Expr.CTX.mkFalse();
+            BoolExpr cur = Expr.CTX.mkFalse();
             for (final String oth : opt.keySet()) {
                 final BoolExpr expr = opt.get(oth);
-                if (match(val, oth)) {
-                    cur = CTX.mkOr(cur, opt.get(oth));
+                if (Expr.match(val, oth)) {
+                    cur = Expr.CTX.mkOr(cur, expr);
                 } else {
-                    negations = CTX.mkOr(negations, expr);
+                    negations = Expr.CTX.mkOr(negations, expr);
                 }
             }
-            cur = CTX.mkAnd(cur, CTX.mkNot(negations));
-            result = CTX.mkAnd(result, cur);
+            cur = Expr.CTX.mkAnd(cur, Expr.CTX.mkNot(negations));
+            result = Expr.CTX.mkAnd(result, cur);
         }
         return result;
     }
 
-    /**
-     * Is it possible to make BoolExpr with this value?
-     * @param obj Parsed o-tag block
-     * @param val Value of o-tag block
-     * @return True if YES, false if NO
-     */
     private static boolean possible(final List<Map<String, BoolExpr>> obj, final String val) {
         boolean result = true;
         for (final Map<String, BoolExpr> opt : obj) {
             boolean cur = false;
             for (final String oth : opt.keySet()) {
-                if (match(val, oth)) {
+                if (Expr.match(val, oth)) {
                     cur = true;
                     break;
                 }
@@ -284,11 +247,6 @@ public final class Expr {
         return result;
     }
 
-    /**
-     * Find all possible values of current variable.
-     * @param obj Parsed o-tag block
-     * @return All possible values of current variable
-     */
     private static Set<String> values(final List<Map<String, BoolExpr>> obj) {
         final Set<String> result = new HashSet<>();
         for (final Map<String, BoolExpr> opt : obj) {
@@ -297,13 +255,14 @@ public final class Expr {
         return result;
     }
 
-    /**
-     * Check that second string matches to first string.
-     * @param first First string
-     * @param second Second string
-     * @return True if second string matches to first, false if it does not
-     */
+    private static String evaluated(final Model model, final String name) {
+        final String val = model.evaluate(
+            Expr.CTX.mkConst(name, Expr.CTX.getStringSort()), true
+        ).toString();
+        return val.substring(1, val.length() - 1);
+    }
+
     private static boolean match(final String first, final String second) {
-        return first.equals(second) || second.equals("\\any");
+        return first.equals(second) || "\\any".equals(second);
     }
 }

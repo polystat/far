@@ -34,7 +34,6 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Test case for {@link FaR}.
- *
  * @since 0.1
  */
 final class FaRTest {
@@ -49,10 +48,8 @@ final class FaRTest {
         );
         MatcherAssert.assertThat(
             bugs,
-            // @checkstyle MagicNumber (1 line)
             Matchers.iterableWithSize(Matchers.not(Matchers.greaterThan(3)))
         );
         Logger.debug(this, "Bugs found: %s", bugs);
     }
-
 }
