@@ -17,5 +17,6 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.3
+      - run: sudo apt-get update && sudo apt-get install -y libmagic-dev
       - run: gem install pdd
       - run: pdd --file=/dev/null
