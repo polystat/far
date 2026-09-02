@@ -28,22 +28,22 @@ SOFTWARE.
   textual boolean expressions. For example, this XML:
 
   <o name="foo">
-    <o line="3" name="a">
-      <opts>
-        <opt m="xxx" x="\any">
-          <tau i="4:1">1</tau>
-          <tau i="3:2">1</tau>
-        </opt>
-      </opts>
-    </o>
+  <o line="3" name="a">
+  <opts>
+  <opt m="xxx" x="\any">
+  <tau i="4:1">1</tau>
+  <tau i="3:2">1</tau>
+  </opt>
+  </opts>
+  </o>
   </o>
 
   Will turn into:
 
   <o name="foo">
-    <o line="3" name="a">
-      <b x="\any">((t4=1 ∧ t3=1))</b>
-    </o>
+  <o line="3" name="a">
+  <b x="\any">((t4=1 ∧ t3=1))</b>
+  </o>
   </o>
   -->
   <xsl:strip-space elements="*"/>

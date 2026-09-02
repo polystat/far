@@ -24,8 +24,8 @@ SOFTWARE.
 -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" id="cleanup-expressions" version="2.0">
   <!--
-    This XSL deletes all <b> elements.
-    -->
+  This XSL deletes all <b> elements.
+  -->
   <xsl:strip-space elements="*"/>
   <xsl:template match="b">
     <!-- just delete it -->

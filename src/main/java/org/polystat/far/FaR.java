@@ -102,7 +102,7 @@ public final class FaR {
             .with(
                 new StLambda(
                     (integer, xml) -> new XMLDocument(
-                        new Xembler(new Expr(xml).find()).applyQuietly(xml.node())
+                        new Xembler(new Expr(xml).find()).applyQuietly(xml.deepCopy())
                     )
                 )
             )
@@ -127,7 +127,7 @@ public final class FaR {
                         }
                         dirs.xpath("/o/input").add("expr").set(expression);
                         return new XMLDocument(
-                            new Xembler(dirs).applyQuietly(xml.node())
+                            new Xembler(dirs).applyQuietly(xml.deepCopy())
                         );
                     }
                 )

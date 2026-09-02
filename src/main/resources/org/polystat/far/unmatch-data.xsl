@@ -28,27 +28,27 @@ SOFTWARE.
   into their TAU texts. For example, this XML:
 
   <o name="foo">
-    <o line="3" name="a" data='42'>
-      <opts>
-         <opt m="xx" x="10">
-            <tau i="4:1">1</tau>
-            <tau i="3:2">1</tau>
-         </opt>
-      </opts>
-    </o>
+  <o line="3" name="a" data='42'>
+  <opts>
+  <opt m="xx" x="10">
+  <tau i="4:1">1</tau>
+  <tau i="3:2">1</tau>
+  </opt>
+  </opts>
+  </o>
   </o>
 
   Will turn into (because 42 doesn't equal to 10):
 
   <o name="foo">
-    <o line="3" name="a" data='42'>
-      <opts>
-         <opt m="xx" x="10">
-            <tau i="4:1">N</tau>
-            <tau i="3:2">N</tau>
-         </opt>
-      </opts>
-    </o>
+  <o line="3" name="a" data='42'>
+  <opts>
+  <opt m="xx" x="10">
+  <tau i="4:1">N</tau>
+  <tau i="3:2">N</tau>
+  </opt>
+  </opts>
+  </o>
   </o>
   -->
   <xsl:strip-space elements="*"/>

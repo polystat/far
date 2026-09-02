@@ -35,30 +35,30 @@ SOFTWARE.
   For example, this XML document:
 
   <o name="foo">
-    <o line="3" name="a">
-      <opts>
-        <r f=".div" pos="2" tau="8">
-          <r f=".div" pos="1" tau="7">
-            <r f=".add" pos="2" tau="3"/>
-          </r>
-        </r>
-      </opts>
-    </o>
+  <o line="3" name="a">
+  <opts>
+  <r f=".div" pos="2" tau="8">
+  <r f=".div" pos="1" tau="7">
+  <r f=".add" pos="2" tau="3"/>
+  </r>
+  </r>
+  </opts>
+  </o>
   </o>
 
   Will turn into:
 
   <o name="foo">
-    <o line="3" name="a">
-      <opts>
-        <r f=".div" pos="2" tau="8">
-          <r f=".div" pos="1" tau="7">
-            <opt m=".add(\perp)[2]" x="\perp">{t3:2=1}</opt>
-            <opt m=".add(\perp)[2]" x="\any">{t3:2=2}</opt>
-          </r>
-        </r>
-      </opts>
-    </o>
+  <o line="3" name="a">
+  <opts>
+  <r f=".div" pos="2" tau="8">
+  <r f=".div" pos="1" tau="7">
+  <opt m=".add(\perp)[2]" x="\perp">{t3:2=1}</opt>
+  <opt m=".add(\perp)[2]" x="\any">{t3:2=2}</opt>
+  </r>
+  </r>
+  </opts>
+  </o>
   </o>
   -->
   <xsl:strip-space elements="*"/>

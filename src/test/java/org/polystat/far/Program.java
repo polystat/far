@@ -73,7 +73,9 @@ final class Program implements Func<String, XML> {
                 new ResourceOf(this.res)
             ).asString()
         );
-        return xml.nodes(String.format("//o[@name='%s']", parts[1])).get(0);
+        return new XMLDocument(
+            xml.nodes(String.format("//o[@name='%s']", parts[1])).get(0).deepCopy()
+        );
     }
 
 }

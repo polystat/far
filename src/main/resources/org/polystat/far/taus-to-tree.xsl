@@ -28,24 +28,24 @@ SOFTWARE.
   XML-tree format. For example, this XML:
 
   <o name="foo">
-    <o line="3" name="a">
-      <opts>
-         <opt m="xx" x="\any">{t4:1=1} {t3:2=1}</opt>
-      </opts>
-    </o>
+  <o line="3" name="a">
+  <opts>
+  <opt m="xx" x="\any">{t4:1=1} {t3:2=1}</opt>
+  </opts>
+  </o>
   </o>
 
   Will turn into:
 
   <o name="foo">
-    <o line="3" name="a">
-      <opts>
-         <opt m="xx" x="\any">
-            <tau i="4:1">1</tau>
-            <tau i="3:2">1</tau>
-         </opt>
-      </opts>
-    </o>
+  <o line="3" name="a">
+  <opts>
+  <opt m="xx" x="\any">
+  <tau i="4:1">1</tau>
+  <tau i="3:2">1</tau>
+  </opt>
+  </opts>
+  </o>
   </o>
   -->
   <xsl:strip-space elements="*"/>

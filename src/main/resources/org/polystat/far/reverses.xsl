@@ -30,27 +30,27 @@ SOFTWARE.
   If this is the input:
 
   <o name="foo">
-    <o name="a"/>
-    <o name="@">
-      <o base="fun">
-        <o base="a"/>
-      </o>
-    </o>
+  <o name="a"/>
+  <o name="@">
+  <o base="fun">
+  <o base="a"/>
+  </o>
+  </o>
   </o>
 
   The output will look like this:
 
   <o name="foo">
-    <o name="a">
-      <opts>
-        <r f="fun" pos="1" tau="1"/>
-      </opts>
-    </o>
-    <o name="@">
-      <o base="fun">
-        <o base="a"/>
-      </o>
-    </o>
+  <o name="a">
+  <opts>
+  <r f="fun" pos="1" tau="1"/>
+  </opts>
+  </o>
+  <o name="@">
+  <o base="fun">
+  <o base="a"/>
+  </o>
+  </o>
   </o>
 
   There will be as many <opts> elements as many times the attribute

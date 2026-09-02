@@ -15,4 +15,3 @@
 ![Lines of code](https://img.shields.io/tokei/lines/github/polystat/far)
 
 This is an experimental analyzer for Polystat.
-

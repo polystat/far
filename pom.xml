@@ -128,7 +128,7 @@ SOFTWARE.
     <dependency>
       <groupId>com.jcabi</groupId>
       <artifactId>jcabi-xml</artifactId>
-      <version>0.27.2</version>
+      <version>0.33.5</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -155,8 +155,8 @@ SOFTWARE.
             <phase>generate-test-resources</phase>
             <goals>
               <goal>register</goal>
-              <goal>assemble</goal>
-              <goal>transpile</goal>
+              <goal>parse</goal>
+              <goal>optimize</goal>
             </goals>
             <configuration>
               <scope>test</scope>
