@@ -1,4 +1,6 @@
-<img src="https://www.polystat.org/logo.svg" height="92px"/>
+# FaR: Find-a-Reverse Analyzer
+
+![Polystat logo](https://www.polystat.org/logo.svg)
 
 [![EO principles respected here](https://www.elegantobjects.org/badge.svg)](https://www.elegantobjects.org)
 [![DevOps By Rultor.com](http://www.rultor.com/b/polystat/far)](http://www.rultor.com/p/polystat/far)
