@@ -109,7 +109,7 @@ SPDX-License-Identifier: MIT
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-params</artifactId>
-      <version>5.9.1</version>
+      <version>5.14.4</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
